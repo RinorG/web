@@ -116,6 +116,8 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
       template = path.resolve(`src/templates/summit.tsx`)
     } else if (node.fileAbsolutePath.indexOf('markdown/jobs') > -1) {
       template = path.resolve(`src/templates/jobs.tsx`)
+    } else if (node.fileAbsolutePath.indexOf('markdown/release-notes') > -1) {
+      template = path.resolve(`src/templates/release-notes.tsx`)
     }
 
     createPage({

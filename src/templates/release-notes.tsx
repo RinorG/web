@@ -7,7 +7,7 @@ import Layout from '../components/layouts/layout/layout'
 import SEO from '../components/layouts/seo/seo'
 
 export default function PageTemplate(props: any) {
-    const { mdx } = props.data
+    const { mdx } = props.data // data.mdx holds our post data
     const { frontmatter: fn, body } = mdx
 
     return (
@@ -24,20 +24,21 @@ export default function PageTemplate(props: any) {
     )
 }
 
-// export const pageQuery = graphql`
-//   query ($path: String!) {
-//     mdx(frontmatter: { path: { eq: $path } }) {
-//       body
-//       frontmatter {
-//         path
-//         title
-//         publishedAt(formatString: "MMMM DD, YYYY")
-//         seo {
-//           title
-//           description
-//           keywords
-//         }
-//       }
-//     }
-//   }
-// `
+export const pageQuery = graphql`
+  query ($path: String!) {
+    mdx(frontmatter: { path: { eq: $path } }) {
+      body
+      frontmatter {
+        path
+        title
+        description
+        publishedAt(formatString: "MMMM DD, YYYY")
+        seo {
+          title
+          description
+          keywords
+        }
+      }
+    }
+  }
+`

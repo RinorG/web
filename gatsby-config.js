@@ -84,6 +84,13 @@ module.exports = {
         path: `${__dirname}/src/markdown/jobs`
       }
     },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `release-notes`,
+        path: `${__dirname}/src/markdown/release-notes`
+      }
+    },
     `gatsby-plugin-image`,
     `gatsby-plugin-sharp`,
     `gatsby-transformer-sharp`,
