@@ -1,7 +1,7 @@
 import React from 'react'
 
 import Button from '../components/freestanding/button/button'
-import { PropTypes as FeaturelistProps } from '../components/layouts/featurelist/feature-list'
+import { PropTypes as ReleaselistProps } from '../components/layouts/release-notes/release-list'
 import { PropTypes as HeroImageProps } from '../components/layouts/hero/hero-image'
 import { PropTypes as SeoProps } from '../components/layouts/seo/seo'
 
@@ -29,7 +29,7 @@ export const hero: HeroImageProps = {
   image: <img className="responsive" loading="lazy" alt="foo" src={Release} />
 }
 
-export const featureList: FeaturelistProps = {
+export const featureList: ReleaselistProps = {
   id: 'release.featurelist',
   slant: true,
   background: 'grey',
@@ -43,34 +43,6 @@ export const featureList: FeaturelistProps = {
           ipsum
         </>
       ),
-      // button: (
-      //     <Button
-      //         style={'link'}
-      //         to={'/docs/kratos/quickstart/'}
-      //         iconRight={ArrowRight}
-      //     >
-      //         Get started
-      //     </Button>
-      // ),
-      features: [
-        {
-          title: (
-            <>
-              <Button style={'link-inline'} to={'#'}>
-                Title of release
-              </Button>
-            </>
-          ),
-          description: (
-            <>
-              orbi faucibus tempus luctus. Sed cursus tortor quis facilisis
-              interdum. Donec ullamcorper sit amet ipsum id rhoncus. Vestibulum
-              quam ipsum
-            </>
-          ),
-          icon: NewRelease
-        }
-      ]
     }
   ]
 }
