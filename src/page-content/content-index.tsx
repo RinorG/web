@@ -61,7 +61,7 @@ export const featureContentCloud: FeatureContentProps = {
   ),
   button: {
     ctaTitle: 'Test now',
-    to: 'https://console.ory.sh/registration',
+    to: 'https://share-eu1.hsforms.com/1kGI3rgpHSa6jAeAmegafKAextgn',
     iconRight: ArrowRight
   },
   content: (
