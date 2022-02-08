@@ -58,7 +58,7 @@ export const featureContentVideo: FeatureContentProps = {
   content: <YoutubeEmbed embedId="ueEAoTQ-CTo" />,
   button: {
     ctaTitle: 'Get Started',
-    to: 'https://console.ory.sh/registration',
+    to: 'https://share-eu1.hsforms.com/1kGI3rgpHSa6jAeAmegafKAextgn',
     iconRight: ArrowRight
   }
 }
