@@ -130,7 +130,7 @@
       "menuItems": [
         {
           "title": "Ory Summit",
-          "to": "/summit21",
+          "to": "/summit/2021/",
           "openInNewWindow": true,
           "dotted": true
         }
