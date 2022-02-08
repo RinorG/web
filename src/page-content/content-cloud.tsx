@@ -40,7 +40,7 @@ export const hero_alt: HeroImageProps = {
     {
       ctaTitle: 'Test Now',
       style: 'filled',
-      to: 'https://console.ory.sh/'
+      to: 'https://share-eu1.hsforms.com/1kGI3rgpHSa6jAeAmegafKAextgn'
     }
   ],
   image: (
@@ -123,7 +123,7 @@ export const featureContentCloud: FeatureContentProps = {
   ),
   button: {
     ctaTitle: 'Get started',
-    to: 'https://console.ory.sh/registration',
+    to: 'https://share-eu1.hsforms.com/1kGI3rgpHSa6jAeAmegafKAextgn',
     iconRight: ArrowRight
   },
   content: (
@@ -205,7 +205,7 @@ export const featureContentUX: FeatureContentProps = {
   ),
   button: {
     ctaTitle: 'Sign up',
-    to: 'https://console.ory.sh/registration',
+    to: 'https://share-eu1.hsforms.com/1kGI3rgpHSa6jAeAmegafKAextgn',
     iconRight: ArrowRight
   },
   content: (
@@ -347,7 +347,7 @@ export const quickstart: QuickstartProps = {
     {
       ctaTitle: 'Sign up',
       style: 'filled',
-      to: 'https://console.ory.sh/registration'
+      to: 'https://share-eu1.hsforms.com/1kGI3rgpHSa6jAeAmegafKAextgn'
     },
     {
       ctaTitle: 'Contact',
