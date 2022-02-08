@@ -12,6 +12,11 @@
           "title": "Pricing",
           "description": "Ory Cloud Pricing",
           "to": "/pricing"
+        },
+        {
+          "title": "Release Notes",
+          "description": "Ory Cloud Release Notes",
+          "to": "/release-notes"
         }
       ]
     },
