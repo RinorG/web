@@ -7,26 +7,26 @@ import Layout from '../components/layouts/layout/layout'
 import SEO from '../components/layouts/seo/seo'
 
 export default function PageTemplate(props: any) {
-  const { mdx } = props.data // data.mdx holds our post data
-  const { frontmatter: fn, body } = mdx || {}
+  const { mdx } = props.data
+  const { frontmatter: fm = {}, body = null } = mdx || {}
 
   return (
     <Layout>
       <SEO
-        description={fn.seo?.description || fn.description}
-        title={fn.seo?.title || fn.title}
-        keywords={fn.seo?.keywords || ''}
+        description={fm.seo?.description || fm.description}
+        title={fm.seo?.title || fm.title}
+        keywords={fm.seo?.keywords || ''}
       />
       <MDXBody padded={true}>
-        <MDXRenderer>{body}</MDXRenderer>
+        {body ? <MDXRenderer>{body}</MDXRenderer> : 'Nothing here'}
       </MDXBody>
     </Layout>
   )
 }
 
 export const pageQuery = graphql`
-  query ($path: String!) {
-    mdx(frontmatter: { path: { eq: $path } }) {
+  query ($mdxId: String!) {
+    mdx(id: { eq: $mdxId }) {
       body
       frontmatter {
         path

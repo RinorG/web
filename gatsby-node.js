@@ -9,7 +9,8 @@ const controlledBlogTags = require('./src/page-content/content-blog.json').tags
 // unfortunately not possible because JS/TS
 // const { slugify } = require('./src/util')
 const slugify = (text) => {
-  return text.toString()
+  return text
+    .toString()
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -22,41 +23,42 @@ const createTagPages = (createPage, posts) => {
 
   posts.forEach(({ node }) => {
     if (!node.frontmatter?.tags) return
-    node.frontmatter.tags
-      .filter(Boolean)
-      .forEach(tagName => {
-        const tagSlug = slugify(tagName)
-        if (!postsByTags[tagSlug]) {
-          postsByTags[tagSlug] = { posts: [], tagName: tagName.trim() }
-        }
-  
-        if (postsByTags[tagSlug].posts.find(({id}) => id === node.id)) return;
-  
-        postsByTags[tagSlug].posts.push(node)
-      })
+    node.frontmatter.tags.filter(Boolean).forEach((tagName) => {
+      const tagSlug = slugify(tagName)
+      if (!postsByTags[tagSlug]) {
+        postsByTags[tagSlug] = { posts: [], tagName: tagName.trim() }
+      }
+
+      if (postsByTags[tagSlug].posts.find(({ id }) => id === node.id)) return
+
+      postsByTags[tagSlug].posts.push(node)
+    })
   })
 
   const tags = Object.keys(postsByTags)
 
-  const tagsSet = new Set(tags
-    .concat(controlledBlogTags.map(({ name }) => slugify(name))));
+  const tagsSet = new Set(
+    tags.concat(controlledBlogTags.map(({ name }) => slugify(name)))
+  )
 
-  tagsSet.forEach(tagSlug => {
-    if (!postsByTags[tagSlug]) return;
+  tagsSet.forEach((tagSlug) => {
+    if (!postsByTags[tagSlug]) return
 
     createPage({
       path: `/blog/tag/${tagSlug}`,
       component: tagPageTemplate,
       context: {
         ...(postsByTags[tagSlug] || {}),
-        tagSlug,
+        tagSlug
       }
     })
   })
 }
 
-const trimLeft = (s, charlist) => {
-  if (charlist === undefined) {
+const trimLeft = (s = '', charlist = '') => {
+  if (!s) return ''
+
+  if (typeof charlist !== 'string' || !charlist) {
     return s.replace(new RegExp('^[s]+'), '')
   }
 
@@ -88,7 +90,9 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
               slug
               tags
               category
-              seo { keywords }
+              seo {
+                keywords
+              }
             }
           }
         }
@@ -106,26 +110,43 @@ exports.createPages = async ({ actions, graphql, reporter }) => {
 
   result.data.allMdx.edges.forEach(({ node }) => {
     let template = path.resolve(`src/templates/page.tsx`)
+    let nodePath = `/${trimLeft(node.frontmatter.path, '/')}`
     let isSummit = false
     if (node.fileAbsolutePath.indexOf('markdown/blog') > -1) {
+      // nodePath = `/blog/post${nodePath}`
       template = path.resolve(`src/templates/blog.tsx`)
     } else if (node.fileAbsolutePath.indexOf('markdown/pages') > -1) {
       template = path.resolve(`src/templates/page.tsx`)
     } else if (node.fileAbsolutePath.indexOf('markdown/summit') > -1) {
       isSummit = true
+      nodePath = `/summit/2021/${trimLeft(node.frontmatter.slug, '/')}/`
       template = path.resolve(`src/templates/summit.tsx`)
     } else if (node.fileAbsolutePath.indexOf('markdown/jobs') > -1) {
       template = path.resolve(`src/templates/jobs.tsx`)
     } else if (node.fileAbsolutePath.indexOf('markdown/release-notes') > -1) {
+      nodePath = `/release-notes${nodePath}`
       template = path.resolve(`src/templates/release-notes.tsx`)
     }
 
+    // The following fields are used by the page object and should be avoided.
+    const {
+      path: drop_path,
+      matchPath: drop_matchPath,
+      component: drop_component,
+      componentChunkName: drop_componentChunkName,
+      pluginCreator___NODE: drop_pluginCreator___NODE,
+      pluginCreatorId: drop_pluginCreatorId,
+      ...context
+    } = node.frontmatter
     createPage({
-      path: isSummit
-        ? `/summit/2021/${trimLeft(node.frontmatter.slug, '/')}/`
-        : `/${trimLeft(node.frontmatter.path, '/')}`,
+      path: nodePath,
       component: template,
-      context: isSummit ? { slug: node.frontmatter.slug } : {}
+      context: {
+        ...context,
+        mdxId: node.id,
+        nodePath,
+        isSummit
+      }
     })
   })
 }
@@ -265,7 +286,7 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
     createNodeField({
       name: `slug`,
       node,
-      value,
+      value
     })
   }
 }

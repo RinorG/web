@@ -117,7 +117,10 @@ const ReleaseList = ({
                         >
                           <ContentText className={cn(pb4, pl8)}>
                             <Molecule>
-                              <Button style={'none'} to={node.frontmatter.path}>
+                              <Button
+                                style={'none'}
+                                to={`/release-notes${node.frontmatter.path}`}
+                              >
                                 <h6 className={cn('font-p is-semibold')}>
                                   {node.frontmatter.title}
                                 </h6>
