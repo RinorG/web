@@ -13,7 +13,7 @@ export const sideNav: Pick<NavProps, 'sideNav'> = {
       Login
     </Button>,
     <Button
-      to={'https://console.ory.sh/registration'}
+      to={'https://share-eu1.hsforms.com/1kGI3rgpHSa6jAeAmegafKAextgn'}
       style={'filled'}
       openInNewWindow={false}
     >
