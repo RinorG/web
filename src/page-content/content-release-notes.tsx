@@ -17,13 +17,15 @@ export const seo: SeoProps = {
 
 export const hero: HeroImageProps = {
   id: 'release.hero',
-  title: <>Text release notes</>,
-  description: 'foobar',
+  title: <>
+      <span className={'is-themed-primary'}>Ory Cloud</span> Release Notes
+    </>,
+  description: 'We strive for making Ory Cloud the best solutions for you.',
   buttons: [
     {
-      ctaTitle: 'Latest release',
+      ctaTitle: 'Explore Ory Cloud',
       style: 'filled',
-      to: '#release.featurelist'
+      to: '/cloud'
     }
   ],
   image: <img className="responsive" loading="lazy" alt="foo" src={Release} />
@@ -38,9 +40,7 @@ export const featureList: ReleaselistProps = {
       title: 'Latest releases',
       description: (
         <>
-          orbi faucibus tempus luctus. Sed cursus tortor quis facilisis
-          interdum. Donec ullamcorper sit amet ipsum id rhoncus. Vestibulum quam
-          ipsum
+          Ory Cloud has now better compatibility with Ory Open Source features, new Network Policies, Cilium and generally performance improving changes.
         </>
       ),
     }
