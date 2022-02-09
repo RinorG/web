@@ -116,16 +116,16 @@ const ReleaseList = ({
                           alignItems={'start'}
                           key={node.frontmatter.path}
                         >
+                          <Button
+
+                              style={'none'}
+                              to={`/release-notes${node.frontmatter.path}`}
+                          >
                           <ContentText className={cn(pb4)}>
                             <Molecule>
-                              <Button
-                                style={'none'}
-                                to={`/release-notes${node.frontmatter.path}`}
-                              >
                                 <h6 className={cn('font-p is-semibold')}>
                                   {node.frontmatter.title}
                                 </h6>
-                              </Button>
                             </Molecule>
                           </ContentText>
                           <Container
@@ -139,6 +139,7 @@ const ReleaseList = ({
                               </Molecule>
                             </ContentText>
                           </Container>
+                          </Button>
                         </Container>
                       )
                     })}
