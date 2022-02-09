@@ -107,15 +107,16 @@ const ReleaseList = ({
               </Grid>
               <Grid lg={6} md={8} sm={12} xs={12}>
                 <div className={cn(className && className)}>
-                  <Container flexContainer={'column'}>
+                  <Container flexContainer={'column'} alignItems={'start'}>
                     {(data.allMdx.edges as Edge[]).map(({ node }) => {
                       return (
                         <Container
                           className={cn(pb24)}
                           flexContainer={'column'}
+                          alignItems={'start'}
                           key={node.frontmatter.path}
                         >
-                          <ContentText className={cn(pb4, pl8)}>
+                          <ContentText className={cn(pb4)}>
                             <Molecule>
                               <Button
                                 style={'none'}
@@ -129,7 +130,6 @@ const ReleaseList = ({
                           </ContentText>
                           <Container
                             flexContainer={'column'}
-                            className={cn(pl24)}
                           >
                             <ContentText>
                               <Molecule>
