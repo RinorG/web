@@ -44,7 +44,7 @@ export const hero_alt: HeroImageProps = {
     {
       ctaTitle: 'Test Now',
       style: 'filled',
-      to: 'https://console.ory.sh/'
+      to: 'https://console.ory.sh/registration'
     }
   ],
   image: (
