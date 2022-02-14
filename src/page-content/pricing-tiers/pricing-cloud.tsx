@@ -19,7 +19,7 @@ export const pricingCloud: Pick<PricingProps, 'cloud'> = {
       priceDescription: 'forever',
       button: {
         title: 'Start building',
-        to: 'https://share-eu1.hsforms.com/1YV9CSKpnSrCNPEdZN7tg2Qextgn'
+        to: 'https://console.ory.sh/registration'
       },
       features: [
         {
@@ -73,8 +73,8 @@ export const pricingCloud: Pick<PricingProps, 'cloud'> = {
       priceIsMonetary: true,
       button: {
         style: 'outlined',
-        title: 'Request free access',
-        to: 'https://share-eu1.hsforms.com/1KWJxgKzNQWOjR9r5blC41wextgn'
+        title: 'Start building',
+        to: 'https://console.ory.sh/registration'
       },
       features: [
         {
