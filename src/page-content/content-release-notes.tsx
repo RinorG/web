@@ -11,8 +11,8 @@ const NewRelease = <i className={'ph-newspaper-fill themed-primary size16'} />
 const ArrowRight = <i className={'ph-arrow-right-bold size16'} />
 
 export const seo: SeoProps = {
-  description: 'foo',
-  title: 'bar'
+  description: 'We strive for making Ory Cloud the best solutions for you.',
+  title: 'Ory Cloud Release Notes'
 }
 
 export const hero: HeroImageProps = {
