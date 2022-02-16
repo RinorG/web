@@ -74,7 +74,7 @@ export const pricingCloud: Pick<PricingProps, 'cloud'> = {
       button: {
         style: 'outlined',
         title: 'Start building',
-        to: 'https://console.ory.sh/registration?preferred_plan=tstart-up'
+        to: 'https://console.ory.sh/registration?preferred_plan=start-up'
       },
       features: [
         {
