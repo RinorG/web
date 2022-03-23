@@ -117,28 +117,25 @@ const ReleaseList = ({
                           key={node.frontmatter.path}
                         >
                           <Button
-
-                              style={'none'}
-                              to={`/release-notes${node.frontmatter.path}`}
+                            style={'none'}
+                            to={`/release-notes${node.frontmatter.path}`}
                           >
-                          <ContentText className={cn(pb4)}>
-                            <Molecule>
+                            <ContentText className={cn(pb4)}>
+                              <Molecule>
                                 <h6 className={cn('font-p is-semibold')}>
                                   {node.frontmatter.title}
                                 </h6>
-                            </Molecule>
-                          </ContentText>
-                          <Container
-                            flexContainer={'column'}
-                          >
-                            <ContentText>
-                              <Molecule>
-                                <p className={cn('font-p-small')}>
-                                  {node.frontmatter.description}
-                                </p>
                               </Molecule>
                             </ContentText>
-                          </Container>
+                            <Container flexContainer={'column'}>
+                              <ContentText>
+                                <Molecule>
+                                  <p className={cn('font-p-small')}>
+                                    {node.frontmatter.description}
+                                  </p>
+                                </Molecule>
+                              </ContentText>
+                            </Container>
                           </Button>
                         </Container>
                       )

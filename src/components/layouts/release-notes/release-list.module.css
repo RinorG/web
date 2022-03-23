@@ -1,13 +1,13 @@
 .feature-list {
-    background: var(--colors-base-background);
-    padding: var(--space-medium) 0;
+  background: var(--colors-base-background);
+  padding: var(--space-medium) 0;
 }
 
 .divider {
-    padding-top: var(--size-16);
+  padding-top: var(--size-16);
 
-&:not(:last-child) {
-     padding-bottom: var(--size-16);
-     border-bottom: var(--size-px) solid var(--colors-base-grey-75);
- }
+  &:not(:last-child) {
+    padding-bottom: var(--size-16);
+    border-bottom: var(--size-px) solid var(--colors-base-grey-75);
+  }
 }

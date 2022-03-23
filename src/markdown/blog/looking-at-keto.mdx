@@ -95,13 +95,12 @@ and that is what I’m using further. To start the local installation, assuming
 the containers are already built, as explained in the
 [repository readme](https://github.com/radekg/ory-reference-compose/blob/master/README.md):
 
-<div class="highlight">
-
+```bash
     git clone https://github.com/radekg/ory-reference-compose.git
     cd ory-reference-compose/compose
     docker-compose -f compose.yml up
+```
 
-</div>
 
 The new Keto version exposes two API servers:
 
@@ -117,55 +116,46 @@ and traversing tuples it knows.
 Relation tuples can be created using `cURL` via the write API. The Compose setup
 publishes both Keto APIs so we can start like this:
 
-<div class="highlight">
-
+```bash
     curl -XPUT --data '{
         "namespace": "default-namespace",
         "object": "company-a",
         "relation": "employs",
         "subject": "director"
     }' http://localhost:4467/relation-tuples
+```
 
-</div>
-
-<div class="highlight">
-
+```bash
     curl -XPUT --data '{
         "namespace": "default-namespace",
         "object": "company-a",
         "relation": "employs",
         "subject": "it-staff"
     }' http://localhost:4467/relation-tuples
-
-</div>
+```
 
 The associations above imply that the company pays for the director and the IT
 staff. We could model it like this:
 
-<div class="highlight">
-
+```bash
     curl -XPUT --data '{
         "namespace": "default-namespace",
         "object": "company-a",
         "relation": "pays",
         "subject": "default-namespace:company-a#employs"
     }' http://localhost:4467/relation-tuples
-
-</div>
+```
 
 That `subject` means: _the company pays for anybody it employs_. Let’s see this
 in action by executing this request against the read API:
 
-<div class="highlight">
-
+```bash
     curl --silent 'http://localhost:4466/expand?namespace=default-namespace&object=company-a&relation=pays&max-depth=10' | jq '.'
-
-</div>
+```
 
 The output is:
 
-<div class="highlight">
-
+```bash
     {
       "type": "union",
       "subject": "default-namespace:company-a#pays",
@@ -186,14 +176,12 @@ The output is:
         }
       ]
     }
-
-</div>
+```
 
 Now, the IT staff subscribes to AWS, Dropbox and GCP. These relations could be
 modelled like this:
 
-<div class="highlight">
-
+```bash
     curl -XPUT --data '{
         "namespace": "default-namespace",
         "object": "it-staff",
@@ -212,28 +200,24 @@ modelled like this:
         "relation": "subscribes",
         "subject": "gcp"
     }' http://localhost:4467/relation-tuples
-
-</div>
+```
 
 As these will bear the cost to the company, the JSON report should list them and
 can be done with this new relation tuple:
 
-<div class="highlight">
-
+```bash
     curl -XPUT --data '{
         "namespace": "default-namespace",
         "object": "company-a",
         "relation": "pays",
         "subject": "default-namespace:it-staff#subscribes"
     }' http://localhost:4467/relation-tuples
-
-</div>
+```
 
 That means: _the company pays for everything the IT staff subscribes to_. If we
 execute the `/expand` call again, the output will be:
 
-<div class="highlight">
-
+```bash
     {
       "type": "union",
       "subject": "default-namespace:company-a#pays",
@@ -272,8 +256,7 @@ execute the `/expand` call again, the output will be:
         }
       ]
     }
-
-</div>
+```
 
 Pretty cool, regardless of how many services the IT staff would subscribe to in
 the future, they will get listed in the output!
@@ -281,30 +264,25 @@ the future, they will get listed in the output!
 Knowing about the cost of a consultant contracted by the director could be
 modelled in the following way:
 
-<div class="highlight">
-
+```bash
     curl -XPUT --data '{
         "namespace": "default-namespace",
         "object": "director",
         "relation": "contracts",
         "subject": "consultant"
     }' http://localhost:4467/relation-tuples
+```
 
-</div>
-
-<div class="highlight">
-
+```bash
     curl -XPUT --data '{
         "namespace": "default-namespace",
         "object": "company-a",
         "relation": "pays",
         "subject": "default-namespace:director#contracts"
     }' http://localhost:4467/relation-tuples
+```
 
-</div>
-
-<div class="highlight">
-
+```bash
     {
       "type": "union",
       "subject": "default-namespace:company-a#pays",
@@ -353,32 +331,26 @@ modelled in the following way:
         }
       ]
     }
-
-</div>
+```
 
 And if the director decides to contract a solicitor?
 
-<div class="highlight">
-
+```bash
     curl -XPUT --data '{
         "namespace": "default-namespace",
         "object": "director",
         "relation": "contracts",
         "subject": "solicitor"
     }' http://localhost:4467/relation-tuples
-
-</div>
+```
 
 the existing relation already covers that:
 
-<div class="highlight">
-
+```bash
     curl --silent 'http://localhost:4466/expand?namespace=default-namespace&object=company-a&relation=pays&max-depth=10' | jq '.'
+```
 
-</div>
-
-<div class="highlight">
-
+```bash
     ...
         {
           "type": "union",
@@ -395,34 +367,29 @@ the existing relation already covers that:
           ]
         },
     ...
-
-</div>
+```
 
 Very neat. At some point, we might want to have an answer to the following
 direct question:
 
 > **does the company pay for the consultant?**
 
-<div class="highlight">
-
+```bash
     curl -XPOST --data '{
         "namespace": "default-namespace",
         "object": "company-a",
         "relation": "pays",
         "subject": "consultant"
     }' http://localhost:4466/check
-
-</div>
+```
 
 To which the answer is:
 
-<div class="highlight">
-
+```bash
     {
       "allowed": true
     }
-
-</div>
+```
 
 If we ever had to understand what relation causes the company to pay for the
 consultant, we would use the `expand` call with sufficient depth.

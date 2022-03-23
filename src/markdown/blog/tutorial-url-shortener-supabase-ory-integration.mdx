@@ -1,0 +1,303 @@
+---
+templateKey: blog
+path: '/tutorial-url-shortener-supabase-ory-integration/'
+author: gen1us2k
+title: Building an URL shortener with Supabase and Ory
+teaser:
+  Learn how to build a URL shortener using open source ready-to-use solutions
+  using the Ory Kratos and Supabase open source projects. Includes code examples
+  for Go and Docker!
+subtitle:
+  Step-by-step guide to create URL shortener with authentication using Ory Cloud
+overline: Ory Supabase Integration
+publishedAt: 2022-03-15
+published: true
+description: ''
+tags:
+  - Guide
+  - Authentication
+  - Ory Cloud
+  - Open Source
+  - User Management
+---
+
+import CodeFromRemote from '../../components/freestanding/utils/codefromremote'
+
+Developers can save time by using ready-made solutions to build new products.
+Most startups concentrate on solving one problem and doing it well. We have at
+least three cloud providers to host our code. There are multiple choices on what
+to use to build a frontend for our next project. For example the
+[VueJS](https://vuejs.org/) and [ReactJS](https://reactjs.org/) projects with
+broad open source communities.
+
+In this article, I'll show you an example of how to build an URL shortener using
+a modern open source technology stack.
+
+You can find the source code for this project
+[on GitHub](https://github.com/gen1us2k/shorts).
+
+## What we will use
+
+- [Ory Kratos](https://www.ory.sh/kratos/docs/) to manage identities and users.
+  We'll use an open source self-hosted version for this tutorial, but for
+  production I recommend [Ory Cloud](https://ory.sh/docs/cloud) - you get a
+  fully featured Ory Kratos instance deployed and
+  [ready to use for free](https://console.ory.sh/registration?preferred_plan=developer).
+- [Supabase](https://supabase.com) is the opensource alternative to Firebase.
+  Supabase Database comes with a [Postgres](https://www.postgresql.org/)
+  database, a free and open-source database that is considered one of the
+  world's most stable and advanced databases. We'll use Supabase as database for
+  our URL shortener.
+- [Ory Oathkeeper](https://www.ory.sh/docs/oathkeeper) would be a great example
+  of applying Zero Trust architecture for our project. We'll use it as identity
+  and access proxy.
+- [Postgres](https://www.postgresql.org/) is a powerful, open source
+  object-relational database system with over 30 years of active development
+  that has earned it a strong reputation for reliability, robustness, and
+  performance.
+- [golang-migrate](https://github.com/golang-migrate/migrate) to perform
+  database migrations.
+
+## Backend choices
+
+I'm a huge fan of the [Go programming language](https://go.dev/), and I've been
+coding using this language since late 2014. I love the simplicity of the Go
+language design and the ecosystem around it.
+
+- It's good to perform static code analysis to make your backend systems more
+  robust and stable. [golangci-lint](https://github.com/golangci/golangci-lint)
+  is a feature-rich linter that gives you feedback about your code. You can find
+  a lot of linters available.
+- Strongly typed programming language with static data types. One does not need
+  to write tests to check that your code will never mess with data types.
+  `int i` makes `i` an integer forever.
+- It's easy to follow SOLID principles and clear architecture using Go.
+- In addition, Go is fast and well-scaled programming language
+
+### Database migrations
+
+Database migrations should be used once you use any relational database
+management system (RDMBS) in your project because you need to change the
+database schema from time to time. It helps you track the different versions of
+your schema and easily perform forwards and downwards migrations. In the
+pythonic world, it's easy to decide what tool to use for schema migrations
+because it's usually comes out of the box with the selected framework. For
+instance, we have flask-migrate for flask and Django migrations for Django.
+Since Go uses the UNIX philosophy to build the architecture of your project, you
+need to choose:
+
+- a HTTP router for your endpoints.
+- an ORM or a library to work with the database.
+- a tool to perform migrations.
+
+The Go programming language has at least two tools for schema migrations. I used
+both `goose` and `migrate`, and for this project, I decided to go with
+`migrate`. Migrate supports more databases, and I want to make the DB layer in
+this project database agnostic.
+
+My requirements for the Go migration tool:
+
+1. Plain SQL migrations support. I don't want to learn an additional filetype
+   formats. I know SQL and I know how to create tables. That's enough. Unlike
+   Django, Go does not have any good
+   [Active Record pattern](https://en.wikipedia.org/wiki/Active_record_pattern)
+   implementations. I hope that there will be more ORMs and better tooling once
+   is [Go 1.18](https://tip.golang.org/doc/go1.18) released - generics are on
+   the way.
+2. Support of open source RDBMS like Postgres, MySQL (and all their forks),
+   Oracle (I don't use it yet).
+3. Programmable API or a shorthanded way to apply migrations.
+4. Upward/Downward support.
+
+### Gin
+
+A URL shortener is a lightweight service, and it would be ideal to have a simple
+enough package to build an HTTP API around it. You have several options on what
+to choose to solve this issue, and the most popular frameworks are:
+
+- [Echo](https://echo.labstack.com)
+- [Gin](https://github.com/gin-gonic/gin)
+- [Go-kit](https://github.com/go-kit/kit)
+
+Go-kit is an excellent framework for building a complex system with many
+microservices. Even a simple net/http with HTTP router would be enough for our
+example. Usually, I toss a coin when I choose between Echo and Gin, so I use Gin
+in this project.
+
+I'm huge fan of gRPC when I build APIs with Go and I used it a lot previously.
+Also, I'm huge fan of the Echo framework. I chose Gin because of it's
+simplicity, convenience, and feature rich support. A simple `net/http` would be
+enough to build this project with
+[httprouter](https://github.com/julienschmidt/httprouter) but Gin is nice to
+work with.
+
+![Illustration of Gopher at work](media/gopher-at-work.png)
+
+_Okay. Let's start hacking, shall we?_
+
+## Configuration package
+
+<CodeFromRemote
+  src="https://github.com/gen1us2k/shorts/blob/master/cmd/shorts/main.go"
+  lang="golang"
+/>
+
+## Defining database schema.
+
+The database for our URL shortener should have the following tables:
+
+- `url` table to store shortened URLs.
+- `url_view` table to store views. This information will be useful to build
+  additional reports for users about top referrers, urlviews or something else.
+
+```sql
+CREATE TABLE IF NOT EXISTS url (
+	id SERIAL PRIMARY KEY,
+	url VARCHAR(255) NOT NULL DEFAULT '',
+	hash varchar(10) NOT NULL DEFAULT '',
+	created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+	expired_at TIMESTAMP WITH TIME ZONE,
+	owner_id VARCHAR(36) NOT NULL DEFAULT ''
+);
+
+CREATE UNIQUE INDEX idx_url_hash ON url(hash);
+
+CREATE TABLE IF NOT EXISTS url_view (
+	id SERIAL PRIMARY KEY,
+	referer VARCHAR(255) NOT NULL DEFAULT '',
+	url_id INT NOT NULL,
+	CONSTRAINT fk_url_view FOREIGN KEY(url_id) REFERENCES url(id)
+);
+```
+
+## Creating Supabase project and tables
+
+- From your [Supabase dashboard](https://app.supabase.io/) , click
+  `New project`.
+- Enter a `Name` for your Supabase project.
+- Enter a secure `Database Password`.
+- Select the `Region` you want.
+- Click Create new project.
+
+![Create Project](./media/supabase/supabase-create-project.png)
+
+- Open table editor.
+- Click on `SQL editor` on sidebar.
+- Insert SQL table definition from the previous step.
+- Click `Run` to create tables.
+
+![Create tables](./media/supabase/supabase-create-table.png)
+
+## Designing the database
+
+I always use interfaces for the database layer because of the following
+benefits:
+
+- I can change a database simply by implementing a designed interface.
+- It helps me to think and design a proper layer for the database.
+- It helps to reduce dependencies between different parts of the codebase.
+- It helps to write more modular and decoupled code.
+- I can always implement a mock for my database layer by simply implementing a
+  mock layer and use it in tests.
+
+<CodeFromRemote
+  src="https://github.com/gen1us2k/shorts/blob/master/database/database.go"
+  lang="golang"
+/>
+
+## Implementing the Database
+
+Supabase uses Postgres as their main RDBMS. Also, they use
+[PostgREST](https://postgrest.org/en/stable/), a standalone web server that
+turns your PostgreSQL database directly into a RESTful API. The structural
+constraints and permissions in the database determine the API endpoints and
+operations. Here's the supabase implementation of the database layer.
+
+<CodeFromRemote
+  src="https://github.com/gen1us2k/shorts/blob/master/database/supabase.go"
+  lang="golang"
+/>
+
+## Designing the HTTP API
+
+An URL shortener is a simple project so we need only two endpoints:
+
+- Shorten URLs by passing a POST request to `/api/url`
+- Get created URLs by passing a GET request to `/api/url` endpoint
+
+Here's the implementation for our API:
+
+<CodeFromRemote
+  src="https://github.com/gen1us2k/shorts/blob/master/api/api.go"
+  lang="golang"
+/>
+
+## Plugging everything together
+
+Create a file in `cmd/shorts/main.go` with the following content
+
+<CodeFromRemote
+  src="https://github.com/gen1us2k/shorts/blob/master/config/config.go"
+  lang="golang"
+/>
+
+## Configuring Ory Oathkeeper
+
+I'll use [Ory Oathkeeper](https://github.com/ory/oathkeeper) to implement zero
+trust network configuration. Ory Oathkeeper acts as a reverse proxy in this
+example, but it checks if the request is authenticated.
+
+URLs that follow `/u/hash` pattern should be available to anonymous users, and
+the API should be available only for authenticated users.
+
+### Basic configuration for Ory Oathkeeper
+
+<CodeFromRemote
+  src="https://github.com/gen1us2k/shorts/blob/master/oathkeeper/oathkeeper.yml"
+  lang="yaml"
+/>
+
+### Access rules for Ory Oathkeeper
+
+<CodeFromRemote
+  src="https://github.com/gen1us2k/shorts/blob/master/oathkeeper/access-rules.yml"
+  lang="yaml"
+/>
+
+## Authenticating users
+
+You can follow the
+[Ory Kratos Quickstart](https://www.ory.sh/docs/kratos/quickstart) to add Ory
+Kratos to your project. You can inspect the
+[docker-compose](https://github.com/gen1us2k/shorts/blob/master/docker-compose.yml)
+and the
+[Ory Kratos configuration](https://github.com/gen1us2k/shorts/tree/master/kratos)
+folder in the repository, but this basic configuration is based on the
+Quickstart guide.
+
+### Authentication middleware
+
+<CodeFromRemote
+  src="https://github.com/gen1us2k/shorts/blob/master/middleware/middleware.go"
+  lang="go"
+/>
+
+## Conclusion & next steps
+
+We have implemented the basic URL shortener API and added authentication with
+Ory Kratos and a SQL backend powered by Supabase. Feel free to
+[fork the repository](https://github.com/gen1us2k/shorts/) and play around with
+it.
+
+I hope you enjoyed this tutorial and found it helpful. If you have any
+questions, check out the Ory community on [Slack](https://slack.ory.sh/) and
+[GitHub](https://github.com/ory/kratos/discussions).
+
+> Stay tuned for part two, where we build the frontend!
+
+Some ideas to improve the backend further:
+
+- Enable
+  [2FA](https://www.ory.sh/docs/kratos/guides/two-factor-authentication-2fa-mfa)
+  for Ory Kratos
+- Add support of AWS Lambda for backend to enable cost-effective hosting

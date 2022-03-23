@@ -102,12 +102,13 @@ We need the following containers:
 
 ### Working with policies
 
-Keto has configured namespace `app` to use in Flask application. Following the
-guide
+Ory Keto has configured a namespace `app` to use in the Flask application.
+Following the guide
 [Check whether a User has Access to Something](https://www.ory.sh/keto/docs/guides/simple-access-check-guide)
-I decided to implement simple permission policy for the demo project:
+I decided to implement a simple permission policy for the demo project:
 
-- Use keto-cli managing permissions.
+- Use the [command line](https://www.ory.sh/docs/keto/cli/keto-check) to manage
+  permissions.
 - Use email for [subjects](https://www.ory.sh/keto/docs/concepts/subjects)
   without `@` symbol.
 
@@ -131,19 +132,20 @@ _Cons_
   startAt="HTTP_STATUS_FORBIDDEN = 403"
 />
 
+You can find the full code used for this blog post on
+[GitHub](https://github.com/gen1us2k/kratos_flask_example).
+
 ## Nota bene
 
-- Consider having `authorization` and `authentication` packages that use
-  [Kratos SDK](https://www.ory.sh/kratos/docs/next/sdk/) and
-  [Keto SDK](https://www.ory.sh/keto/docs/next/sdk/index/). Instead of just
-  calling some magic endpoints, your code will be more readable with SDKs.
+- Consider having `authorization` and `authentication` packages that use the
+  [Ory Kratos SDK](https://www.ory.sh/kratos/docs/next/sdk/) and the
+  [Ory Keto SDK](https://www.ory.sh/keto/docs/next/sdk/index/). Instead of just
+  calling magic endpoints, your code will be more readable when using an SDK.
 - Please pay attention to configure
   [login session](https://www.ory.sh/kratos/docs/guides/login-session/) and
   [cookies](https://www.ory.sh/kratos/docs/guides/configuring-cookies).
-- It's better to use
-  [Ory Cloud](https://www.ory.sh/docs/start-building/create-project) instead of
-  having Ory Kratos managed by your team just because Ory manages it, and you
-  don't need to enable observability/logging/metrics for your service.
+- Skip the set up with
+  [Ory Cloud](https://www.ory.sh/docs/start-building/create-project).
 
 ## Next steps
 

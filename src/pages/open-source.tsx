@@ -12,7 +12,7 @@ import SEO from '../components/layouts/seo/seo'
 import Stats from '../components/layouts/stats/stats'
 import * as content from '../page-content/content-opensource'
 import { sharedAdopters } from '../page-content/shared/content-adopters'
-import { sharedBannerOpensource } from '../page-content/shared/content-banner'
+import { sharedBannerSlack } from '../page-content/shared/content-banner'
 import * as shared from '../page-content/shared/content-opensource'
 import { sharedQuotes } from '../page-content/shared/content-quotes'
 import { sharedStats } from '../page-content/shared/content-stats'
@@ -21,7 +21,7 @@ const OpensourcePage = () => (
   <Layout>
     <SEO {...content.seo} />
     <Projects {...shared.opensourceProjects} />
-    <Banner {...sharedBannerOpensource} />
+    <Banner {...sharedBannerSlack} />
     <Adopters {...sharedAdopters} />
     <FeatureList {...content.projectlist} />
     <Stats {...sharedStats} />

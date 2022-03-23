@@ -276,6 +276,19 @@ https://www.ory.sh/blog/tag/product https://www.ory.sh/blog/tag/ory-cloud 302!
 
 https://www.ory.sh/blog/tag/qualitity-assurance https://www.ory.sh/blog/tag/quality-assurance 302!
 
+### PUT ANY DOCS REDIRECTS HERE
+
+# 03/22 Delete empty documentation pages
+
+https://www.ory.sh/docs/get-started https://www.ory.sh/docs/guides/protect-page-login 302!
+https://www.ory.sh/docs/sdk https://www.ory.sh/docs/guides 302!
+
+https://www.ory.sh/docs/ecosystem/styleguide https://github.com/ory/docs/blob/master/README.md 302!
+https://www.ory.sh/docs/ecosystem/styleguide/testing https://github.com/ory/docs/blob/master/README.md 302!
+https://www.ory.sh/docs/ecosystem/styleguide/templates https://github.com/ory/docs/blob/master/README.md 302!
+
+### END PUT ANY DOCS REDIRECTS HERE
+
 # Proxy to new docs
 /docs/ /docs/welcome 302!
 /docs/* https://docs-omega-six.vercel.app/docs/:splat 200!
@@ -284,3 +297,4 @@ https://www.ory.sh/blog/tag/qualitity-assurance https://www.ory.sh/blog/tag/qual
 /kratos/docs/* https://www.ory.sh/docs/kratos/:splat 302!
 /oathkeeper/docs/* https://www.ory.sh/docs/oathkeeper/:splat 302!
 /hydra/docs/* https://www.ory.sh/docs/hydra/:splat 302!
+

@@ -218,10 +218,12 @@ To start everything up we need `cmd/mrrobot/main.go`:
 ### Configuring AWS Gateway
 
 1. Create a new REST API.
-1. In the "Resources" section create a new `ANY` method to handle requests to `/` (check "Use Lambda Proxy Integration").
-![API Gateway index](https://akrylysov.github.io/algnhsa/apigateway-index.png)
-1. Add a catch-all `{proxy+}` resource to handle requests to every other path (check "Configure as proxy resource").
-![API Gateway catch-all](https://akrylysov.github.io/algnhsa/apigateway-catchall.png)
+1. In the "Resources" section create a new `ANY` method to handle requests to
+   `/` (check "Use Lambda Proxy Integration").
+   ![API Gateway index](https://akrylysov.github.io/algnhsa/apigateway-index.png)
+1. Add a catch-all `{proxy+}` resource to handle requests to every other path
+   (check "Configure as proxy resource").
+   ![API Gateway catch-all](https://akrylysov.github.io/algnhsa/apigateway-catchall.png)
 
 ## Final steps
 

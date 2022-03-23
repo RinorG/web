@@ -17,7 +17,6 @@ seo:
   canonical: |
     https://vadosware.io/post/how-i-built-lwhn/
 
-
 publishedAt: '2022-02-17'
 author: vadosware
 
@@ -199,15 +198,15 @@ A couple things went distinctively wrong:
 had more important fish to fry - thinking about it was a constant source of
 discontent. Funnily enough, I gave up just when I had figured everything out -
 and I had just written a glorious DB adapter that actually worked like I wanted
-it to:   
+it to:
 
 <details>
   <summary markdown="span">📜️ node-oidc-provider DB Adapter (click to expand)</summary>
 
 ```typescript
-
-import { Logger } from "@nestjs/common";
-import { DBService } from "./services/db";
+import { Logger } from '@nestjs/common'
+import { OIDCGrant } from './models'
+import { DBService } from './services/db'
 import {
   getTypeForOIDCProviderModelName,
   getTypeValidatorForOIDCProviderModelName,
@@ -217,125 +216,130 @@ import {
   getOIDCModelPrefix,
   isExpirableEntity,
   isConsumableEntity,
-  isConsumableOIDCProviderModel,
-} from "./types";
-
-import {
-  OIDCGrant,
-} from "./models";
-
+  isConsumableOIDCProviderModel
+} from './types'
 /**
  * Arguments required to build an oidc-provider adapter that uses a DBService
  * @see buildOIDCAdapter
- */
-interface BuildDBOIDCAdapterArgs {
-  db: DBService;
-  logger?: Logger;
+ */ interface BuildDBOIDCAdapterArgs {
+  db: DBService
+  logger?: Logger
 }
-
-export type OIDCAdapterClassFunction =  (name: string) => void;
-
+export type OIDCAdapterClassFunction = (name: string) => void
 /**
  * Builder for OIDC Adapter that uses a DBService
  *
  * @see https://github.com/panva/node-oidc-provider/blob/main/example/my_adapter.js
  * @param {BuildDBOIDCAdapterArgs} args
  * @returns {Promise<Function>} A constructor function that builds oidc-provider compliant functions
- */
-export async function buildOIDCAdapter(args: BuildDBOIDCAdapterArgs): Promise<OIDCAdapterClassFunction> {
-  const { db, logger } = args;
+ */ export async function buildOIDCAdapter(
+  args: BuildDBOIDCAdapterArgs
+): Promise<OIDCAdapterClassFunction> {
+  const { db, logger } = args
+  logger } = args;
 
-  // Create anonymous class that performans as an Adapter usable by oidc-provider
+  // Create anonymous class that performans as an Adapter usa
   return function DBOIDCAdapter(name) {
-    this.name = name;
-    this.db = db;
-
+    this.name = name
+    this.db = db
     this.upsert = async (
       partialID: OIDCProviderModelID,
       payload: OIDCProviderModel,
-      expiresInSeconds?: number,
+      expiresInSeconds?: number
     ) => {
-      const fullID = this.key(partialID);
-      const expiresAt = expiresInSeconds ? new Date(new Date().getTime() + (expiresInSeconds * 1000)) : null;
+      const fullID = this.key(partialID)
+      const expiresAt = expiresInSeconds
+        ? new Date(new Date().getTime() + expiresInSeconds * 1000)
+        : null
+      const modelClass = getTypeForOIDCProviderModelName(this.name)
+      const validator = getTypeValidatorForOIDCProviderModelName(this.name)
+      (this.name);
 
-      const modelClass = getTypeForOIDCProviderModelName(this.name);
-      const validator = getTypeValidatorForOIDCProviderModelName(this.name);
-
-      // Ensure the payload matches what we expect the model class to look like?
+      // Ensure the payload matches what we expect the model
       if (!validator(payload)) {
-        logger?.error(`Invalid payload for OIDC model class [${modelClass.name}]: ${JSON.stringify(payload, null, '  ')}`);
-        throw new Error(`Invalid payload for OIDC model class [${modelClass.name}]`);
+        logger?.error(
+          `Invalid payload for OIDC model class [${
+            modelClass.name
+          }]: ${JSON.stringify(payload, null, '  ')}`
+        )
+        throw new Error(
+          `Invalid payload for OIDC model class [${modelClass.name}]`
+        )
+      }
+      ]`);
       }
 
-      // Grantable classes must have grant
-      await db.upsertEntityByID(modelClass, fullID, {...payload, expiresAt });
-    };
-
+      // Grantable cla
+      await db.upsertEntityByID(modelClass, fullID, { ...payload, expiresAt })
+    }
     this.find = async (partialID: OIDCProviderModelID) => {
-      const cls = getTypeForOIDCProviderModelName(this.name);
-      const fullID = this.key(partialID);
-      const entity = await db.findEntity(cls, { id: fullID });
-      if (!entity) { return undefined; }
-
+      const cls = getTypeForOIDCProviderModelName(this.name)
+      const fullID = this.key(partialID)
+      const entity = await db.findEntity(cls, { id: fullID })
+      if (!entity) {
+        return undefined
+      }
       if (isExpirableEntity(entity)) {
-        if (new Date() <= entity.expiresAt) { return undefined; }
+        if (new Date() <= entity.expiresAt) {
+          return undefined
+        }
       }
-
       if (isConsumableEntity(entity)) {
-        if (new Date() < entity.consumedAt) { return undefined; }
+        if (new Date() < entity.consumedAt) {
+          return undefined
+        }
       }
-
-      return entity;
-    };
-
+      return entity
+    }
     this.findByUserCode = async (userCode: string) => {
-      const cls = getTypeForOIDCProviderModelName(this.name);
-      const entity = await db.findEntity(cls, { userCode });
-      if (!entity) { return undefined; }
-      return entity;
-    };
-
-    this.findByUid = async (uid: string) => {
-      const cls = getTypeForOIDCProviderModelName(this.name);
-      const entity = await db.findEntity(cls, { uid });
-      if (!entity) { return undefined; }
-      return entity;
-    };
-
-    this.consume = async (partialID: OIDCProviderModelID) => {
-      const fullID = this.key(partialID);
-      const cls = getTypeForOIDCProviderModelName(this.name);
-
-      if (!isConsumableOIDCProviderModel(cls)) {
-        throw new TypeError(`class [${cls.name}] is not consumable`);
+      const cls = getTypeForOIDCProviderModelName(this.name)
+      const entity = await db.findEntity(cls, { userCode })
+      if (!entity) {
+        return undefined
       }
-
-      await db.consumeEntity(cls, fullID);
-    };
-
+      return entity
+    }
+    this.findByUid = async (uid: string) => {
+      const cls = getTypeForOIDCProviderModelName(this.name)
+      const entity = await db.findEntity(cls, { uid })
+      if (!entity) {
+        return undefined
+      }
+      return entity
+    }
+    this.consume = async (partialID: OIDCProviderModelID) => {
+      const fullID = this.key(partialID)
+      const cls = getTypeForOIDCProviderModelName(this.name)
+      if (!isConsumableOIDCProviderModel(cls)) {
+        throw new TypeError(`class [${cls.name}] is not consumable`)
+      }
+      await db.consumeEntity(cls, fullID)
+    }
     this.destroy = async (partialID: OIDCProviderModelID) => {
-      const fullID = this.key(partialID);
-      await db.deleteEntity(getTypeForOIDCProviderModelName(this.name), { id: fullID });
-    };
-
+      const fullID = this.key(partialID)
+      await db.deleteEntity(getTypeForOIDCProviderModelName(this.name), {
+        id: fullID
+      })
+    }
     this.revokeByGrantId = async (partialGrantID: OIDCGrantID) => {
-      const id = `grant_${partialGrantID}`;
-      const grant = await db.findEntity<OIDCGrant>(OIDCGrant, {id});
-      if (!grant) { throw new Error(`No such OIDCGrant with ID [${id}]`); }
+      const id = `grant_${partialGrantID}`
+      const grant = await db.findEntity<OIDCGrant>(OIDCGrant, { id })
+      if (!grant) {
+        throw new Error(`No such OIDCGrant with ID [${id}]`)
+      }
+      [${id}]`); }
 
-      // Delete the grant and all related tokens
-      await db.deleteGrantAndRelatedEntities(id);
-    };
-
+      // Delete the grant an
+      await db.deleteGrantAndRelatedEntities(id)
+    }
     this.key = (id: string) => {
-      return `${getOIDCModelPrefix(this.name)}_${id}`;
-    };
-  };
+      return `${getOIDCModelPrefix(this.name)}_${id}`
+    }
+  }
 }
-
 ```
-</details>
 
+</details>
 
 The pain of having to figure out every single one of those enums & classes
 (`OIDCGrant`, `OIDCProviderModelID`), write the appropriate DB entities, and do
@@ -471,8 +475,8 @@ out and solve - **how do we actually authenticate people from HN?**
 
 ## Step three: Building the login mechanism
 
-Let's zoom back out and build the actual login mechanism - that shouldn't be
-too hard to hack right?
+Let's zoom back out and build the actual login mechanism - that shouldn't be too
+hard to hack right?
 
 Since HN has public profile pages that users can modify at any time, we can
 easily verify any user can access any account:
@@ -493,71 +497,80 @@ method really boils down to one important `setInterval`:
   <summary> 📜️ Important setInterval #1, checking the HN Profil (click to expand)</summary>
 
 ```js
+// Start watching for account
+let times = 0
+const intervalID = setInterval(async () => {
+  try {
+    // If we've exceeded max checks, then stop polling
+    if (times >= maxChecks) {
+      this.ongoingPolls.delete(hnUsername)
+      clearInterval(intervalID)
+      throw new Error(
+        `Exceeded max checks [${maxChecks}] (delayMs: ${delayMs})`
+      )
+    }
+    times++
 
+    // Check user's YC profile
+    this.logger.debug(
+      `looking for [${displayToken}] on HN profile [${hnUsername}]`
+    )
 
-   // Start watching for account
-    let times = 0;
-    const intervalID = setInterval(
-      async () => {
-        try {
-          // If we've exceeded max checks, then stop polling
-          if (times >= maxChecks) {
-            this.ongoingPolls.delete(hnUsername);
-            clearInterval(intervalID);
-            throw new Error(`Exceeded max checks [${maxChecks}] (delayMs: ${delayMs})`);
-          }
-          times++;
+    // PREVIOUSLY:
+    //
+    // // FUTURE: if fallbacks get implemented, require that delay from ENV is no less than 30 seconds like before!
+    // const resp = await axios.get(
+    //   `https://news.ycombinator.com/user?id=${hnUsername}`,
+    //   {responseType: 'text'},
+    // );
+    //
+    // const profileDataContainsCode = resp.data.includes(buildLoginTokenPhrase(displayToken));
 
-          // Check user's YC profile
-          this.logger.debug(`looking for [${displayToken}] on HN profile [${hnUsername}]`);
+    // Get user data using Firebase HN API
+    const resp = await axios.get(
+      `https://hacker-news.firebaseio.com/v0/user/${hnUsername}.json`
+    )
 
-          // PREVIOUSLY:
-          //
-          // // FUTURE: if fallbacks get implemented, require that delay from ENV is no less than 30 seconds like before!
-          // const resp = await axios.get(
-          //   `https://news.ycombinator.com/user?id=${hnUsername}`,
-          //   {responseType: 'text'},
-          // );
-          //
-          // const profileDataContainsCode = resp.data.includes(buildLoginTokenPhrase(displayToken));
+    const about = resp?.data?.about
+    if (!about) {
+      this.logger.error(
+        'About unexpectedly missing on response from Firebase API'
+      )
+      return
+    }
 
-          // Get user data using Firebase HN API
-          const resp = await axios.get(`https://hacker-news.firebaseio.com/v0/user/${hnUsername}.json`);
+    // If the profile data contained the right info, then clear the interval and mark the account logged in
+    if (!about.includes(buildLoginTokenPhrase(displayToken))) {
+      return
+    }
 
-          const about = resp?.data?.about;
-          if (!about) {
-            this.logger.error("About unexpectedly missing on response from Firebase API");
-            return;
-          }
+    // At this point we have found the display token, the user has confirmed usage of the account
+    this.logger.debug(
+      `found display token [${displayToken}] on HN profile [${hnUsername}]`
+    )
 
-          // If the profile data contained the right info, then clear the interval and mark the account logged in
-          if (!about.includes(buildLoginTokenPhrase(displayToken))) { return; }
+    // Confirm login success
+    await this.dbSvc.confirmLoginSuccessByHNUsername({
+      hnUsername,
+      hnMetadata: {
+        karma: resp?.data?.karma,
+        // created is expected to be unix epoch
+        createdAtISOString: new Date(resp?.data?.created * 1000).toISOString()
+      }
+    })
 
-          // At this point we have found the display token, the user has confirmed usage of the account
-          this.logger.debug(`found display token [${displayToken}] on HN profile [${hnUsername}]`);
-
-          // Confirm login success
-          await this.dbSvc.confirmLoginSuccessByHNUsername({
-            hnUsername,
-            hnMetadata: {
-              karma: resp?.data?.karma,
-              // created is expected to be unix epoch
-              createdAtISOString: new Date(resp?.data?.created * 1000).toISOString(),
-            },
-          });
-
-          // Stop checking since it's been found
-          this.ongoingPolls.delete(hnUsername);
-          clearInterval(intervalID);
-        } catch (err) {
-          this.logger.error(`Error occurred while checking for HN profile page update: ${err.toString()}`);
-        }
-      },
-      delayMs,
-    );
-    this.ongoingPolls.set(hnUsername, displayToken);
-
+    // Stop checking since it's been found
+    this.ongoingPolls.delete(hnUsername)
+    clearInterval(intervalID)
+  } catch (err) {
+    this.logger.error(
+      `Error occurred while checking for HN profile page update: ${err.toString()}`
+    )
+  }
+}, delayMs)
+this.ongoingPolls.set(hnUsername, displayToken)
 ```
+
 </details>
 
 And that's basically it! you can imagine what `this.dbSvc` (in fact the
@@ -656,8 +669,6 @@ here's one example:
 
 </details>
 
-
-
 That's what it looks like to _start_ the login flow. What I haven't included
 here is the bit where I generate a `login_challenge` from Hydra but it's not
 hard to do (you'll get one by just setting up Hydra correctly).
@@ -715,50 +726,51 @@ just `POST`ing username/password details to our app and being whisked away to
 the OAuth2 server, we need to actually _wait_ for a message to come back. I've
 kept it simple with some polling:
 
-
 <details>
 <summary>📜️ The second important setInterval (click to expand)</summary>
 
 ```javascript
-  // Start polling to check for resolution of login
-  let intervalID = setInterval(
-    () => {
-      // Check whether the account has been confirmed using the display token
-      fetch(
-        "/api/v1/hn/poll/status",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "same-origin",
-          body: JSON.stringify({ displayToken }),
-        },
-      )
-        .then(loginStartResp => processFetchJSONResponse({ response: loginStartResp }))
-        .then(envelope => processLoginResultData(envelope))
-        .then(loggedIn => {
-          if (!loggedIn) { return; }
-          // If login succeeded, then we can stop polling
-          // Next steps should have been triggered in processLoginResultData() and will be triggering soon
-          if (indicatorElem) { indicatorElem.classList.add("hidden"); }
-
-          clearInterval(intervalID);
-        })
-        .catch(err => {
-          showPageFlash({
-            variant: "error",
-            title: "Error while checking login",
-            description: `An error occurred while checking your profile... Please try <a href="/">logging in again</a>.`,
-          });
-
-          if (indicatorElem) { indicatorElem.classList.remove("hidden"); }
-
-          clearInterval(intervalID);
-        });
+// Start polling to check for resolution of login
+let intervalID = setInterval(() => {
+  // Check whether the account has been confirmed using the display token
+  fetch('/api/v1/hn/poll/status', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
     },
-    CHECK_HN_POLL_RESULT_INTERVAL_MS,
-  );
+    credentials: 'same-origin',
+    body: JSON.stringify({ displayToken })
+  })
+    .then((loginStartResp) =>
+      processFetchJSONResponse({ response: loginStartResp })
+    )
+    .then((envelope) => processLoginResultData(envelope))
+    .then((loggedIn) => {
+      if (!loggedIn) {
+        return
+      }
+      // If login succeeded, then we can stop polling
+      // Next steps should have been triggered in processLoginResultData() and will be triggering soon
+      if (indicatorElem) {
+        indicatorElem.classList.add('hidden')
+      }
+
+      clearInterval(intervalID)
+    })
+    .catch((err) => {
+      showPageFlash({
+        variant: 'error',
+        title: 'Error while checking login',
+        description: `An error occurred while checking your profile... Please try <a href="/">logging in again</a>.`
+      })
+
+      if (indicatorElem) {
+        indicatorElem.classList.remove('hidden')
+      }
+
+      clearInterval(intervalID)
+    })
+}, CHECK_HN_POLL_RESULT_INTERVAL_MS)
 
 // You'll need this as well for context!
 
@@ -771,51 +783,55 @@ kept it simple with some polling:
 function processLoginResultData(envelope) {
   // Ensure data is present
   if (!envelope.data) {
-    const err = new Error("Data missing from envelope");
-    err.responseData = envelope;
-    throw err;
+    const err = new Error('Data missing from envelope')
+    err.responseData = envelope
+    throw err
   }
 
   // Ensure request succeeded
-  if (envelope.status !== "success") {
-    genericErrorFlash();
-    console.error(err);
-    const err = new Error("Login failed");
-    err.responseData = envelope;
-    throw err;
+  if (envelope.status !== 'success') {
+    genericErrorFlash()
+    console.error(err)
+    const err = new Error('Login failed')
+    err.responseData = envelope
+    throw err
   }
 
   // Get the redirect URL
-  const { confirmed, redirectURL } = envelope.data;
+  const { confirmed, redirectURL } = envelope.data
 
   // Return immediately if the user is still not confirmed
-  if (!confirmed) { return false; }
+  if (!confirmed) {
+    return false
+  }
 
   if (!redirectURL) {
-    console.error(err);
-    const err = new Error("redirectURL unexpectedly missing from response");
-    err.responseData = envelope;
-    throw err;
+    console.error(err)
+    const err = new Error('redirectURL unexpectedly missing from response')
+    err.responseData = envelope
+    throw err
   }
 
   // Show flash signalling successful login
   showPageFlash({
-      variant: "success",
-      title: "Login successful",
-      description: "You've been logged in! Redirecting...",
-    flashDurationMs: DEFAULT_FLASH_DURATION_MS,
-  });
+    variant: 'success',
+    title: 'Login successful',
+    description: "You've been logged in! Redirecting...",
+    flashDurationMs: DEFAULT_FLASH_DURATION_MS
+  })
 
   // If the response succeeded, then the login cookie has been set,
   // we can go to the page to finish out the login
-  setTimeout(() => window.location = redirectURL, LOGIN_SUCCESS_REDIRECT_WAIT_MS);
+  setTimeout(
+    () => (window.location = redirectURL),
+    LOGIN_SUCCESS_REDIRECT_WAIT_MS
+  )
 
-  return true;
+  return true
 }
-
 ```
-</details>
 
+</details>
 
 This time I'm checking in with the core functionality API to check whether the
 `setInterval` from earlier has resolved itself.

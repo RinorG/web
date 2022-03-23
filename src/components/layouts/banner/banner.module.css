@@ -8,3 +8,7 @@
   border-bottom: var(--size-px-2) dotted;
   border-color: var(--colors-base-grey-200);
 }
+
+.banner-padded {
+  padding-bottom: var(--space-large);
+}
